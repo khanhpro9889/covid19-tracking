@@ -7,6 +7,8 @@ const Box = styled.div`
     border: 1px solid silver;
     border-radius: 8px;
     margin-bottom: 32px;
+    position: relative;
+    z-index: -1;
 `
 const Title = styled.h3`
     font-size: 1.375rem;

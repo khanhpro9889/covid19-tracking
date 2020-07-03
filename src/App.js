@@ -72,10 +72,17 @@ const SearchResult = styled.div`
   position: absolute;
   top: 100%;
   width: 100%;
-  height: 100px;
   border-radius: 30px;
-  display: none;
-  background: white;
+  background-color: white;
+`
+const Ul = styled.ul`
+  margin-bottom: 0px;
+`
+const Li = styled.li`
+  text-align: left;
+  padding: 10px 15px;
+  font-size: 20px;
+  list-style-type: none;
 `
 function numberWithCommas(number) {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -87,6 +94,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoading1, setIsLoading1] = useState(false);
   const [countryList, setCountryList] = useState([]);
+  const [findedCountry, setFindedCountry] = useState([]);
   const getDataGlobal = async (sort1, sort2, sort3, isDecrease) => {
     setIsLoading1(true);
     const response = await axios.get('https://api.covid19api.com/summary');
@@ -193,8 +201,11 @@ function App() {
     console.log("getAllCountries -> countryList.data", countryList.data)
   }
 
-  const searchCountry = () => {
-    const
+  const searchCountry = (contentSearch) => {
+    const regex = new RegExp(`(\w)*${contentSearch}(\w)*`, "gi");
+    const findedCountry1 = countryList.filter(item => regex.test(item.Country));
+    setFindedCountry(findedCountry1);
+    console.log(findedCountry1);
   }
 
   useEffect(() => {
@@ -212,14 +223,26 @@ function App() {
           <Title>Virus corona (Covid 19)</Title>
           <CenterDiv>
             <SearchBarParent>
-              <SearchBar />
-              <IconParents><Icon name="search" size="big" color="gray" onChange={(e) => {
+              <SearchBar onChange={(e) => {
                 if(e.target.value.length < 3) {
+                  setFindedCountry([]);
                   return;
                 }
-                searchCountry();
-              }}/></IconParents>
-              <SearchResult></SearchResult>
+                searchCountry(e.target.value);
+              }}/>
+              <IconParents><Icon name="search" size="big" /></IconParents>
+              {findedCountry.length !== 0 ? 
+              (<SearchResult>
+                <Ul>
+                  {findedCountry.map(i => {return {...i, IS02: i.ISO2.toLowerCase()}}).map(item => {
+                    return (
+                      <Li key={item.IS02}><img src={`https://www.countryflags.io/${item.IS02.toLowerCase()}/flat/32.png`}/> {item.Country}</Li>
+                    )
+                  })}
+                </Ul>
+               </SearchResult>
+              ) : ''
+              }
             </SearchBarParent>
           </CenterDiv>
         </BoxImg>
