@@ -193,8 +193,8 @@ function App() {
     console.log("getAllCountries -> countryList.data", countryList.data)
   }
 
-  const searchCountry = () => {
-    const
+  const searchCountry = (content) => {
+    const findedCountry = listCountry.find(item => item.Country === )
   }
 
   useEffect(() => {
@@ -217,7 +217,7 @@ function App() {
                 if(e.target.value.length < 3) {
                   return;
                 }
-                searchCountry();
+                searchCountry(e.target.value);
               }}/></IconParents>
               <SearchResult></SearchResult>
             </SearchBarParent>
