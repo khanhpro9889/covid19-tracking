@@ -4,3 +4,6 @@
     box-sizing: border-box;
     font-family: 'Google Sans', sans-serif;
 }
+.border-top{
+    border-top: 1px solid silver;
+}

@@ -6,7 +6,6 @@ const Box = styled.div`
     border: 1px solid silver;
     border-radius: 8px;
     margin-bottom: 32px;
-    z-index: -1;
     position: relative;
 `
 const Title = styled.h3`
@@ -49,11 +48,11 @@ function numberWithCommas(number) {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 const Records = (props) => {
-    const {data, isLoading} = props;
+    const {data, isLoading, countryName} = props;
 
     return (
         <Box>
-            <Title>Toàn thế giới</Title>
+            <Title>{countryName}</Title>
             <ClearFix>
                 <SubBox>
                     <SubTitle>Số ca xác nhận nhiễm</SubTitle>

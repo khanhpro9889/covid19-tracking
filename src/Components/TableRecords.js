@@ -8,7 +8,6 @@ const Box = styled.div`
     border-radius: 8px;
     margin-bottom: 32px;
     position: relative;
-    z-index: -1;
 `
 const Title = styled.h3`
     font-size: 1.375rem;
@@ -23,7 +22,10 @@ const Bottom = styled.span`
     margin-top: 28px;
 `
 const Cell1 = styled.span`
-
+    cursor: pointer;
+`
+const MarginTop = styled.div`
+    margin-top: 1.5rem;
 `
 const TableRecords = (props) => {
     const {global, sort, isLoading} = props;
@@ -103,11 +105,11 @@ const TableRecords = (props) => {
                 <Loader />
             </Dimmer>
             </Dimmer.Dimmable>
-            <div>
+            <MarginTop>
                 <span>
                     <Bottom>Nguồn: WikipediaEuropean Centre for Disease Prevention and Control</Bottom>
                 </span>
-            </div>
+            </MarginTop>
         </Box>
     );
 }
