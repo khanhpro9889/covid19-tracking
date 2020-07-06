@@ -44,9 +44,10 @@ const SearchBarParent = styled.div`
 const SearchBar = styled.input`
   width: 100%;
   border-radius: 30px;
-  padding: 10px 15px;
+  padding: 10px 10px;
   font-size: 22px;
   padding-left: 55px;
+  padding-right: 55px;
   border: 1px solid silver;
   box-shadow: 5px 5px 10px silver;
   ${({ active }) => active && `
@@ -76,7 +77,12 @@ const IconParents = styled.div`
   left: 10px;
   top: 13px;
 `
-
+const IconParents1 = styled.div`
+  position: absolute;
+  right: 10px;
+  top: 13px;
+  cursor: pointer;
+`
 const SearchResult = styled.div`
   border: 1px solid gray;
   position: absolute;
@@ -96,10 +102,14 @@ const Ul = styled.ul`
   margin-bottom: 0px;
   position: relative;
   z-index: 1000;
-  background: black;
-  ${({ active }) => active && `
-   background: blue;
-  `}
+  & li:last-child{
+    border-bottom: none;
+  }
+  & li:last-child:hover {
+    background: silver;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+  }
 `
 const Li = styled.li`
   text-align: left;
@@ -107,10 +117,9 @@ const Li = styled.li`
   font-size: 20px;
   list-style-type: none;
   cursor: pointer;
+  border-bottom: 1px solid silver;
   &:hover{
-    background: gray;
-    border-bottom-left-radius: 30px;
-    border-bottom-right-radius: 30px;
+    background: silver;
   }
 `
 
@@ -165,6 +174,8 @@ function App() {
   const [nameSelectedCountry, setNameSelectedCountry] = useState('Toan the gioi');
   const [activeWhenClick, setActiveWhenClick] = useState(false);
   const [lastFindedCountry, setLastFindedCountry] = useState([]);
+  const [nameTemp, setNameTemp] = useState('');
+
   const getDataGlobal = async () => {
     setIsLoading1(true);
     const response = await axios.get('https://api.covid19api.com/summary');
@@ -203,6 +214,7 @@ function App() {
     })
     setIsLoading1(false);
   }
+
   const sort = (sort1, sort2, sort3, isDecrease) => {
     var listCountry2 = global.listCountryBeforeCommas;
   
@@ -269,12 +281,14 @@ function App() {
     })
     setGlobal({...global, listCountry: listCountry1})
   }
+
   const getDataByCountry = async (country = -1) => {
     var totalConfirmed;
     var totalDeaths;
     var totalRecovered;
     setIsLoading(true);
     if(country === -1) {
+      setNameSelectedCountry('Toan the gioi');
       const response = await axios.get('https://api.covid19api.com/world/total');
       setIsLoading(false);
       totalConfirmed = numberWithCommas(response.data.TotalConfirmed);
@@ -283,6 +297,7 @@ function App() {
       setSelectedCountry({Country: 'Toàn thế giới'});
     } else {
       if(country.Country === 'Toan the gioi') {
+        setNameSelectedCountry('Toan the gioi');
         const response = await axios.get('https://api.covid19api.com/world/total');
         setIsLoading(false);
         totalConfirmed = numberWithCommas(response.data.TotalConfirmed);
@@ -290,7 +305,12 @@ function App() {
         totalDeaths = numberWithCommas(response.data.TotalDeaths);
         setSelectedCountry({Country: 'Toàn thế giới'});
       } else {
+        setNameSelectedCountry(country.Country);
         setSelectedCountry(country);
+        if(country.ISO2 !== 'vn') {
+          setLastFindedCountry([{Country: 'Toan the gioi', ISO2: 'WORLD'}, {Country: 'Viet Nam', ISO2: 'vn'}, country]);
+        }
+        
         const response = await axios.get(`https://api.covid19api.com/country/${country.Slug}`);
         setIsLoading(false);
         const length = response.data.length;
@@ -310,8 +330,6 @@ function App() {
           totalConfirmed = totalRecovered = totalDeaths = 'Không có dữ liệu';
         }
       }
-      
-      
     }
     setData({
       totalConfirmed: totalConfirmed,
@@ -319,6 +337,7 @@ function App() {
       totalDeaths: totalDeaths
     })
     setFindedCountry([]);
+    setActiveWhenClick(false);
     setActive(false);
   }
   const getAllCountries = async () => {
@@ -332,15 +351,14 @@ function App() {
     setFindedCountry(findedCountry1);
     if(findedCountry1.length !== 0) {
       setActive(true);
-      setActiveWhenClick(false);
+      setActiveWhenClick(true);
     } else {
-      setActive(false);
+      setFindedCountry([]);
     }
-    console.log(findedCountry1);
   }
 
   useEffect(() => {
-    setLastFindedCountry([{Country: 'Toan the gioi', ISO2: 'WORLD'}]);
+    setLastFindedCountry([{Country: 'Toan the gioi', ISO2: 'WORLD'}, {Country: 'Viet Nam', Slug: 'Vietnam', ISO2: 'vn'}]);
     getDataGlobal();
     getDataByCountry();
     getAllCountries();
@@ -363,29 +381,39 @@ function App() {
                 }
                 searchCountry(e.target.value);
               }} onFocus={() => {
+                setNameTemp(nameSelectedCountry);
                 setNameSelectedCountry('');
                 console.log(lastFindedCountry);
                 setActive(true);
-                setActiveWhenClick(true);
-                
+                setActiveWhenClick(true);     
               }}/>
               <IconParents><Icon name="search" size="big" /></IconParents>
-              {findedCountry.length !== 0 ? 
+              { activeWhenClick && <IconParents1 onClick={() => {
+                console.log(nameSelectedCountry);
+                setActiveWhenClick(false);
+                setActive(false);
+                setNameSelectedCountry(nameTemp);
+              }}><Icon name="close" size="big" /></IconParents1>}
+              {activeWhenClick ? 
               (<SearchResult active={active}>
-                <Ul active={!activeWhenClick}>
+                {(findedCountry.length !== 0 ) ? <Ul>
                   {findedCountry.map(i => {return {...i, IS02: i.ISO2.toLowerCase()}}).map(item => {
                     return (
-                      <Li onClick={() => getDataByCountry(item)} key={item.IS02}><img src={`https://www.countryflags.io/${item.IS02.toLowerCase()}/flat/32.png`}/> {item.Country}</Li>
+                      <Li onClick={() => getDataByCountry(item)} key={item.IS02}>
+                        <img src={`https://www.countryflags.io/${item.IS02.toLowerCase()}/flat/32.png`}/> {item.Country}
+                      </Li>
                     )
                   })}
-                </Ul>
-                <Ul active={activeWhenClick}>
+                </Ul> :
+                <Ul active={active}>
                   {lastFindedCountry.map(i => {return {...i, IS02: i.ISO2.toLowerCase()}}).map(item => {
                     return (
-                      <Li onClick={() => getDataByCountry(item)} key={item.IS02}><img src={`https://www.countryflags.io/${item.IS02.toLowerCase()}/flat/32.png`}/> {item.Country}</Li>
+                      <Li onClick={() => getDataByCountry(item)} key={item.IS02}>
+                        {(!(item.IS02 === 'world')) ? (<img src={`https://www.countryflags.io/${item.IS02.toLowerCase()}/flat/32.png`}/>) : <Icon name="world"/>} {item.Country}
+                      </Li>
                     )
                   })}
-                </Ul>
+                </Ul>}
                </SearchResult>
               ) : ''
               }
