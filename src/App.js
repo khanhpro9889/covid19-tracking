@@ -38,7 +38,7 @@ const Title = styled.div`
 const SearchBarParent = styled.div`
   width: 40%;
   height: 50px;
-  position: relative
+  position: relative;
 `
 
 const SearchBar = styled.input`
@@ -55,6 +55,7 @@ const SearchBar = styled.input`
     border-top-left-radius: 30px;
     border-top-right-radius: 30px;
   `}
+  
 `
 
 const CenterDiv = styled.div`
@@ -98,6 +99,18 @@ const SearchResult = styled.div`
     border: 1px solid silver;
   `}
 `
+
+const Li = styled.li`
+  text-align: left;
+  padding: 10px 15px;
+  font-size: 20px;
+  list-style-type: none;
+  cursor: pointer;
+  border-bottom: 1px solid silver;
+  &:hover{
+    background: silver;
+  }
+`
 const Ul = styled.ul`
   margin-bottom: 0px;
   position: relative;
@@ -111,18 +124,6 @@ const Ul = styled.ul`
     border-bottom-right-radius: 30px;
   }
 `
-const Li = styled.li`
-  text-align: left;
-  padding: 10px 15px;
-  font-size: 20px;
-  list-style-type: none;
-  cursor: pointer;
-  border-bottom: 1px solid silver;
-  &:hover{
-    background: silver;
-  }
-`
-
 const ItemSearch = styled.span`
   &:hover {
     background: gray;
@@ -310,10 +311,12 @@ function App() {
         if(country.ISO2 !== 'vn') {
           setLastFindedCountry([{Country: 'Toan the gioi', ISO2: 'WORLD'}, {Country: 'Viet Nam', ISO2: 'vn'}, country]);
         }
-        
+        const summary = await axios.get('https://api.covid19api.com/summary');
+
+        const arr = summary.data.Countries.filter(item => item.Slug.toLowerCase() === country.Slug.toLowerCase());
+      
         const response = await axios.get(`https://api.covid19api.com/country/${country.Slug}`);
         setIsLoading(false);
-        const length = response.data.length;
         var arrDate = [];
         var arrConfirmed = [];
         response.data.forEach(item => {
@@ -323,9 +326,9 @@ function App() {
         })
         setDataCountry({arrDate: arrDate, arrConfirmed: arrConfirmed});
         try{
-          totalConfirmed = numberWithCommas(response.data[length - 1].Confirmed);
-          totalRecovered = numberWithCommas(response.data[length - 1].Recovered);
-          totalDeaths = numberWithCommas(response.data[length - 1].Deaths);
+          totalConfirmed = numberWithCommas(arr[0].TotalConfirmed);
+          totalRecovered = numberWithCommas(arr[0].TotalRecovered);
+          totalDeaths = numberWithCommas(arr[0].TotalDeaths);
         } catch (err){
           totalConfirmed = totalRecovered = totalDeaths = 'Không có dữ liệu';
         }

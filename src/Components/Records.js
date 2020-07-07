@@ -26,7 +26,7 @@ const SubBox = styled.div`
 
 const SubTitle = styled.div`
     color: #5f6368;
-    font-size: 0.75rem
+    font-size: 0.75rem;
 `
 
 const Number = styled.div`
@@ -44,9 +44,6 @@ const Wiki = styled.span`
     margin-left: 10px;
 `
 
-function numberWithCommas(number) {
-    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-}
 const Records = (props) => {
     const {data, isLoading, countryName} = props;
 
@@ -54,11 +51,11 @@ const Records = (props) => {
         <Box>
             <Title>{countryName}</Title>
             <ClearFix>
-                <SubBox>
+                <SubBox className="after-div">
                     <SubTitle>Số ca xác nhận nhiễm</SubTitle>
                     <Number>{!isLoading ? data.totalConfirmed : (<Loader active inline/>)}</Number>
                 </SubBox>
-                <SubBox>
+                <SubBox className="after-div">
                     <SubTitle>Số ca đã bình phục</SubTitle>
                     <Number>{!isLoading ? data.totalRecovered : (<Loader active inline/>)}</Number>
                 </SubBox>
