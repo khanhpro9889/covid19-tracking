@@ -23,7 +23,6 @@ const Left = styled.div`
 const Right = styled.div`
     width: 30%;
     float: left;
-    padding-left: 10px;
 `
 const Title = styled.div`
     font-size: 1.1rem;
