@@ -7,3 +7,15 @@
 .border-top{
     border-top: 1px solid silver;
 }
+.after-div {
+    position: relative;
+}
+.after-div::after {
+    content:  '';
+    width: 1px;
+    height: 100%;
+    position: absolute;
+    right: -20px;
+    top: 0px;
+    background: silver;
+}

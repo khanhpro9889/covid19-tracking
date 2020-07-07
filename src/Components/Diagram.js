@@ -73,9 +73,8 @@ const Diagram = (props) => {
                     data={{
                         labels: data.arrDate,
                         datasets: [{
-                            label: 'Confirmed cáse',
+                            label: 'Confirmed case',
                             data: data.arrConfirmed,
-                            
                             pointBackgroundColor: "#55bae7",
                             pointBorderColor: "#55bae7",
                             pointHoverBackgroundColor: "#55bae7",

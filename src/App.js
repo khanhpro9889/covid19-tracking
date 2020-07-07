@@ -7,7 +7,10 @@ import Records from './Components/Records';
 import {Container, Row, Col} from 'reactstrap';
 import TableRecords from './Components/TableRecords';
 import axios from 'axios';
-import Diagram from './Components/Diagram'
+import Diagram from './Components/Diagram';
+import News from './Components/News';
+
+//d1ec8f2d91524441951bf5a02d6fcd23
 const BoxImg = styled.div`
   width: 100%;
   height: 300px;
@@ -39,6 +42,12 @@ const SearchBarParent = styled.div`
   width: 40%;
   height: 50px;
   position: relative;
+  @media (max-width: 768px) {
+    width: 70%;
+  }
+  @media (max-width: 425px) {
+    width: 60%;
+  }
 `
 
 const SearchBar = styled.input`
@@ -157,7 +166,7 @@ font-weight: 500;
 color: #202124;
 margin-bottom: 4px;
 `
-
+//thêm dấu chấm
 function numberWithCommas(number) {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
@@ -175,8 +184,12 @@ function App() {
   const [nameSelectedCountry, setNameSelectedCountry] = useState('Toan the gioi');
   const [activeWhenClick, setActiveWhenClick] = useState(false);
   const [lastFindedCountry, setLastFindedCountry] = useState([]);
+  const [listCountryBeforeCommas, setListCountryBeforeCommas] = useState([]);
   const [nameTemp, setNameTemp] = useState('');
+  const [news, setNews] = useState([]);
+  const initialCountry = [{Country: 'Toan the gioi', ISO2: 'WORLD', Slug: 'world'}, {Country: 'Viet Nam', Slug: 'Vietnam', ISO2: 'vn'}]
 
+  //table
   const getDataGlobal = async () => {
     setIsLoading1(true);
     const response = await axios.get('https://api.covid19api.com/summary');
@@ -194,7 +207,7 @@ function App() {
       return 0;
     })
 
-    const listCountry1 = listCountry.map(item => {
+    const listCountryAfterCommas = listCountry.map(item => {
       return {
         ...item,
         NewConfirmed: numberWithCommas(item.NewConfirmed),
@@ -210,24 +223,25 @@ function App() {
       totalConfirmed: totalConfirmed,
       totalRecovered: totalRecovered,
       totalDeaths: totalDeaths,
-      listCountry: listCountry1,
-      listCountryBeforeCommas: listCountry
+      listCountry: listCountryAfterCommas,
     })
+    setListCountryBeforeCommas(listCountry);
     setIsLoading1(false);
   }
 
+  //sắp xếp
   const sort = (sort1, sort2, sort3, isDecrease) => {
-    var listCountry2 = global.listCountryBeforeCommas;
+    var listCountry = listCountryBeforeCommas;
   
     if(sort1 === true) {
       if(isDecrease === true) {
-        listCountry2.sort((a, b) => {
+        listCountry.sort((a, b) => {
           if(a.TotalConfirmed > b.TotalConfirmed) return -1;
           if(a.TotalConfirmed < b.TotalConfirmed) return 1;
           return 0;
         })
       }else {
-        listCountry2.sort((a, b) => {
+        listCountry.sort((a, b) => {
           if(a.TotalConfirmed < b.TotalConfirmed) return -1;
           if(a.TotalConfirmed > b.TotalConfirmed) return 1;
           return 0;
@@ -239,13 +253,13 @@ function App() {
     if(sort2 === true) {
       console.log("aaa");
       if(isDecrease === true) {
-        listCountry2.sort((a, b) => {
+        listCountry.sort((a, b) => {
           if(a.TotalRecovered > b.TotalRecovered) return -1;
           if(a.TotalRecovered < b.TotalRecovered) return 1;
           return 0;
         })
       }else {
-        listCountry2.sort((a, b) => {
+        listCountry.sort((a, b) => {
           if(a.TotalRecovered < b.TotalRecovered) return -1;
           if(a.TotalRecovered > b.TotalRecovered) return 1;
           return 0;
@@ -256,20 +270,20 @@ function App() {
 
     if(sort3 === true) {
       if(isDecrease) {
-        listCountry2.sort((a, b) => {
+        listCountry.sort((a, b) => {
           if(a.TotalDeaths > b.TotalDeaths) return -1;
           if(a.TotalDeaths < b.TotalDeaths) return 1;
           return 0;
         })
       }else{
-        listCountry2.sort((a, b) => {
+        listCountry.sort((a, b) => {
           if(a.TotalDeaths < b.TotalDeaths) return -1;
           if(a.TotalDeaths > b.TotalDeaths) return 1;
           return 0;
         })
       }
     }
-    const listCountry1 = listCountry2.map(item => {
+    const listCountry1 = listCountry.map(item => {
       return {
         ...item,
         NewConfirmed: numberWithCommas(item.NewConfirmed),
@@ -305,16 +319,18 @@ function App() {
         totalRecovered = numberWithCommas(response.data.TotalRecovered);
         totalDeaths = numberWithCommas(response.data.TotalDeaths);
         setSelectedCountry({Country: 'Toàn thế giới'});
+        setDataCountry({arrDate: [], arrConfirmed: []});
       } else {
         setNameSelectedCountry(country.Country);
         setSelectedCountry(country);
         if(country.ISO2 !== 'vn') {
-          setLastFindedCountry([{Country: 'Toan the gioi', ISO2: 'WORLD'}, {Country: 'Viet Nam', ISO2: 'vn'}, country]);
+          setLastFindedCountry([...initialCountry, country]);
         }
         const summary = await axios.get('https://api.covid19api.com/summary');
 
         const arr = summary.data.Countries.filter(item => item.Slug.toLowerCase() === country.Slug.toLowerCase());
       
+        //diagram
         const response = await axios.get(`https://api.covid19api.com/country/${country.Slug}`);
         setIsLoading(false);
         var arrDate = [];
@@ -325,6 +341,7 @@ function App() {
           
         })
         setDataCountry({arrDate: arrDate, arrConfirmed: arrConfirmed});
+
         try{
           totalConfirmed = numberWithCommas(arr[0].TotalConfirmed);
           totalRecovered = numberWithCommas(arr[0].TotalRecovered);
@@ -332,6 +349,7 @@ function App() {
         } catch (err){
           totalConfirmed = totalRecovered = totalDeaths = 'Không có dữ liệu';
         }
+        
       }
     }
     setData({
@@ -343,6 +361,7 @@ function App() {
     setActiveWhenClick(false);
     setActive(false);
   }
+  
   const getAllCountries = async () => {
     const countryList = await axios.get('https://api.covid19api.com/countries');
     setCountryList(countryList.data);
@@ -360,11 +379,19 @@ function App() {
     }
   }
 
+  const getAllNews = async() => {
+    const response = await axios.get('http://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=d1ec8f2d91524441951bf5a02d6fcd23');
+    const news = response.data.articles.splice(0, 6);
+    setNews(news);
+    console.log(news);
+  }
+
   useEffect(() => {
-    setLastFindedCountry([{Country: 'Toan the gioi', ISO2: 'WORLD'}, {Country: 'Viet Nam', Slug: 'Vietnam', ISO2: 'vn'}]);
+    setLastFindedCountry([...initialCountry]);
     getDataGlobal();
     getDataByCountry();
     getAllCountries();
+    getAllNews();
   }, []);
 
   return (
@@ -440,7 +467,7 @@ function App() {
               
             </Col>
             <Col md={4}>
-              
+              <News news={news}/>
             </Col>
           </Row>
         </Container>
