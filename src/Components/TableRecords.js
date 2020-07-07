@@ -38,9 +38,9 @@ const TableRecords = (props) => {
 
     const sort1 = () => {
         if(count1 % 2 === 0) {
-            sort(true, false, true, true);
+            sort(true, false, false, true);
         } else {
-            sort(true, false, true, false);
+            sort(true, false, false, false);
         }
         setStrong1(true);
         setStrong2(false);
@@ -82,7 +82,7 @@ const TableRecords = (props) => {
                         <Cell><Cell1 onClick={sort3}>{!strong3 ? 'Số ca tử vong' : (<strong>Số ca tử vong</strong>)} {strong3 ? ((count3 % 2 === 0) ? (<Icon name="arrow up"/>):(<Icon name="arrow down"/>)) : '' }</Cell1></Cell>
                     </Row>
                     <Row>
-                        <Cell><strong>{global.listCountry ? 'Toàn thế giới' : ''}</strong></Cell>
+                        <Cell><strong><Icon name="world" />{global.listCountry ? 'Toàn thế giới' : ''}</strong></Cell>
                         <Cell><strong>{global.totalConfirmed}</strong></Cell>
                         <Cell><strong>{global.totalRecovered}</strong></Cell>
                         <Cell><strong>{global.totalDeaths}</strong></Cell>
